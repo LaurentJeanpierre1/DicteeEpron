@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dictée</string>
+    <string name="action_settings">Préférences</string>
+    <string name="invite" >Entrez le mot dicté !</string>
+    <string name="answerHint">Entrez le mot ici</string>
+    <string name="SolutionText">Solution</string>
+    <string name="validateString">OK</string>
+    <string name="bravo">Bravo !</string>
+</resources>

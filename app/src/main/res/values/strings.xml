@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Dictation</string>
+    <string name="action_settings">Settings</string>
+    <string name="invite" >Please type in the spoken word!</string>
+    <string name="answerHint">Enter spoken word here</string>
+    <string name="SolutionText">Solution</string>
+    <string name="validateString">OK</string>
+    <string name="bravo">Well done!</string>
+</resources>
