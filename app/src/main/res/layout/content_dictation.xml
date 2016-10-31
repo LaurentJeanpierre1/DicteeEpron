@@ -22,16 +22,16 @@
         android:text="@string/SolutionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/Solution"
+        android:id="@+id/solution"
         android:layout_marginTop="12dp"
         android:layout_centerHorizontal="true" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
+        android:inputType="textVisiblePassword"
         android:ems="10"
-        android:layout_below="@+id/Solution"
+        android:layout_below="@+id/solution"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
         android:id="@+id/editAnswer"
@@ -44,9 +44,20 @@
         android:text="@string/validateString"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editAnswer"
-        android:layout_centerHorizontal="true"
         android:id="@+id/validate"
         style="@android:style/Widget.Button"
-        android:onClick="onValidatePressed" />
+        android:onClick="onValidatePressed"
+        android:layout_below="@+id/editAnswer"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"/>
+
+    <Button
+        android:text="@string/repeatText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/repeat"
+        style="@android:style/Widget.Button"
+        android:onClick="onRepeatPressed"
+        android:layout_below="@+id/editAnswer"
+        android:layout_alignParentStart="true"/>
 </RelativeLayout>

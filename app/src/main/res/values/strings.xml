@@ -6,4 +6,7 @@
     <string name="SolutionText">Solution</string>
     <string name="validateString">OK</string>
     <string name="bravo">Well done!</string>
+    <string name="failure">No! It was \"%s\".</string>
+    <string name="spokenInviteWord">Write the word, \"{}\".</string>
+    <string name="repeatText">Repeat</string>
 </resources>
