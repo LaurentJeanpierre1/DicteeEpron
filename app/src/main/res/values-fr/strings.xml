@@ -11,4 +11,5 @@
     <string name="spokenInviteWord">écrit : \"{}\".</string>
     <string name="repeatText">Répéter</string>
     <string name="textScore">score : %s</string>
+    <string name="soundsTitle">Sons :</string>
 </resources>
