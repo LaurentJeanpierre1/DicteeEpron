@@ -15,16 +15,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
-/**
+/** The Words database
  * Created by jeanpierre on 07/12/16.
  */
 public class WordsDatabase extends SQLiteOpenHelper {
-  // Database Version
-  private static final int DATABASE_VERSION = 6; // Lettre F
   // Database Name
   private static final String DATABASE_NAME = "words.sqlite";
   // words table name
   private static final String TABLE_WORDS = "Words";
+
+  // Database Version
+  private static final int DATABASE_VERSION = 14; // Lettre G
+  // Latest letter from database. TODO find out automatically
+  public static final char last_letter = 'G';
+  // All letters from database. TODO find out automatically
+  public static final String all_letters = "";
+  /* Think about updating arrays.Sounds for new letters TODO update automatically */
 
   private Context contex;
 
@@ -63,7 +69,6 @@ public class WordsDatabase extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-    // Nothing to do ?
     try {
       importDB(contex, contex.getDatabasePath(DATABASE_NAME));
     } catch (IOException e) {
@@ -101,7 +106,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
 // looping through all rows and adding to list
     if (cursor.moveToFirst()) {
       do {
-        wordsList.add(cursor.getString(0));
+        wordsList.add(cursor.getString(0).trim()); // remove extra spaces just-in-case
         String p = cursor.getString(1);
         if (p == null)
           soundsList.add(wordsList.getLast());

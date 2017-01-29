@@ -1,35 +1,17 @@
 package com.laurent.jeanpierre.dictee;
 
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
+import android.app.ActionBar;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
+import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.StringJoiner;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * A Preferences Activity
@@ -44,9 +26,22 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
       getFragmentManager().beginTransaction().replace(android.R.id.content, frag=new SettingsFragment()).commit();
 
       checkValues();
+
+      ActionBar actionBar = getActionBar();
+      if (actionBar != null)
+        actionBar.setDisplayHomeAsUpEnabled(true); // Displays up button in action bar
     }
 
-    private void checkValues()
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == android.R.id.home) { // receives up-button notification
+      NavUtils.navigateUpFromSameTask(this); // util to navigate back to parent task
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  private void checkValues()
     {
       SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     }
@@ -72,7 +67,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     Set<String> ss = sharedPreferences.getStringSet(s,null);
     Preference p = frag.findPreference(s);
-    if (p instanceof MultiSelectListPreference) {
+    if (p instanceof MultiSelectListPreference && ss != null) {
       //EditTextPreference editTextPref = (EditTextPreference) p;
       //p.setSummary(editTextPref.getText());
       StringBuilder sb = new StringBuilder();
