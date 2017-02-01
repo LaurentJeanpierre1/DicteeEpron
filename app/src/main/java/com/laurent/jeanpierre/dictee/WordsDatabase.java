@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -25,19 +26,20 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 14; // Lettre G
-  // Latest letter from database. TODO find out automatically
-  public static final char last_letter = 'G';
-  // All letters from database. TODO find out automatically
-  public static final String all_letters = "";
-  /* Think about updating arrays.Sounds for new letters TODO update automatically */
+  private static final int DATABASE_VERSION = 16; // Lettre ʃ (ch)
+  /** Latest letter from database. */
+  public static char last_letter = 'ʃ';
+  /** All letters from database. */
+  public static String all_letters = "";
+  /** All letters from database. */
+  public static LinkedList<String> all_letters_array = new LinkedList<>();
 
   private Context contex;
 
   public WordsDatabase(Context context) {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    words = new String[10];
-    wordsPronounce = new String[10];
+    words = new String[20];
+    wordsPronounce = new String[20];
 
     this.contex = context;
     File dbPath = context.getDatabasePath(DATABASE_NAME);
@@ -84,7 +86,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
     LinkedList<String> soundsList = new LinkedList<String>();
 // Select All Query
     String selectQuery = "SELECT name,pronunce FROM " + TABLE_WORDS;
-    if (filter != null)
+    if ((filter != null) && !filter.isEmpty())
       selectQuery += " WHERE `set` IN "+filter;
     SQLiteDatabase db = this.getReadableDatabase();
     Cursor cursor;
@@ -121,4 +123,29 @@ public class WordsDatabase extends SQLiteOpenHelper {
     i=0;
     for (String w : soundsList) wordsPronounce[i++] = w;
   } // getAllWords()
+
+  /**
+   * Fetches all the letters from the database
+   */
+  public static void computeLetters(Context c) {
+    try {
+      WordsDatabase base = new WordsDatabase(c);
+      SQLiteDatabase db = base.getReadableDatabase();
+      Cursor cursor = db.rawQuery("select distinct `set` from Words", null);
+      StringBuilder sb = new StringBuilder();
+      if (cursor.moveToFirst()) {
+        do {
+          String letter = cursor.getString(0).trim(); // remove extra spaces just-in-case
+          sb.append(letter);
+          all_letters_array.add(letter);
+        } while (cursor.moveToNext());
+      }
+      cursor.close();
+      all_letters = sb.toString();
+      last_letter = sb.charAt(sb.length()-1);
+      db.close();
+    } catch (Exception e) {
+      Log.e("Dictée","Unable to compute letters from database",e);
+    }
+  }
 } // class WordsDatabase

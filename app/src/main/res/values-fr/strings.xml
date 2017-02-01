@@ -12,4 +12,10 @@
     <string name="repeatText">Répéter</string>
     <string name="textScore">score : %s</string>
     <string name="soundsTitle">Sons :</string>
+    <string name="errors_over">erreurs /</string>
+    <string name="prompt_restart">Vous allez arrêter l\'entraînement ! Voulez-vous recommencer à zéro ?</string>
+    <string name="title_activity_settings">Préférences</string>
+    <string name="no">NON</string>
+    <string name="yes">Oui</string>
+    <string name="all">tous</string>
 </resources>

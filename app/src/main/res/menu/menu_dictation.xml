@@ -8,4 +8,8 @@
         android:title="@string/action_settings"
         app:showAsAction="never"
         android:enabled="true"/>
+    <item android:id="@+id/action_results"
+          android:title="Résultats"
+          app:showAsAction="ifRoom"
+          android:icon="@android:drawable/ic_menu_revert"/>
 </menu>

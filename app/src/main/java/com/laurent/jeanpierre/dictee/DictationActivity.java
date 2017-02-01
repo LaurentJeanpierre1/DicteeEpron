@@ -1,18 +1,18 @@
 package com.laurent.jeanpierre.dictee;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -22,9 +22,9 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StrikethroughSpan;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,6 +43,9 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
   private int[] wordCount;
   private int nbWords;
   private int score;
+
+  int[] trials;
+  int[] failures;
 
   private String solution;
   private int solutionIdx;
@@ -71,8 +74,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     } catch (SQLiteDatabaseCorruptException ex) {
       Log.d("Dictée", "Database updated?", ex);
     }
-
-    resetWords("(\""+WordsDatabase.last_letter+"\")"); // TODO fetch initial filter
+    WordsDatabase.computeLetters(this);
+    resetWords("(\""+WordsDatabase.last_letter+"\")");
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(new View.OnClickListener() {
@@ -93,15 +96,22 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
   }
 
   private void resetWords(String filter) {
-    db = new WordsDatabase(this);
-    db.getAllWords(filter);
-    words = db.words;
-    wordsPronounce = db.wordsPronounce;
+    if (filter != null) {
+      db = new WordsDatabase(this);
+      db.getAllWords(filter);
+      words = db.words;
+      wordsPronounce = db.wordsPronounce;
+    }
 
     nbWords = words.length;
     wordCount = new int[nbWords];
-    for (int i=0; i<nbWords; ++i)
+    trials = new int[nbWords];
+    failures = new int[nbWords];
+    for (int i=0; i<nbWords; ++i) {
       wordCount[i] = 3;
+      trials[i] = 0;
+      failures[i] = 0;
+    }
     nbWords = 3*words.length;
     isReset = true;
   }
@@ -158,6 +168,20 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       Intent intent = new Intent();
       intent.setClassName(this, "com.laurent.jeanpierre.dictee.SettingsActivity");
       startActivity(intent);
+      return true;
+    } else if (id == R.id.action_results) {
+      new AlertDialog.Builder(this).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+        }
+      }).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          showResults();
+          resetWords(null);
+        }
+      }).setMessage(R.string.prompt_restart).show();
+      return true;
     }
 
     return super.onOptionsItemSelected(item);
@@ -168,6 +192,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     CloseKeyBoard(getApplicationContext());
     final EditText answer = (EditText) findViewById(R.id.editAnswer);
     String answerText = answer.getText().toString().trim().replaceAll(" {2,}"," ");
+    ++trials[solutionIdx];
     if (answerText.equalsIgnoreCase(solution)) {
       msg = R.string.bravo;
       dur = Snackbar.LENGTH_SHORT;
@@ -185,6 +210,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       ++wordCount[solutionIdx];
       ++nbWords;
       --score;
+      ++failures[solutionIdx];
       ((FloatingActionButton) findViewById(R.id.fab)).setVisibility(ImageView.VISIBLE);
       SpannableStringBuilder text = new SpannableStringBuilder();
       StrDiff dif = null;
@@ -263,4 +289,13 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     sb.append(')');
     resetWords(sb.toString());
   }
-}
+
+  public void showResults() {
+    Intent intent = new Intent(this, ResultActivity.class);
+    intent.putExtra("WORDS", words);
+    intent.putExtra("TRIALS", trials);
+    intent.putExtra("FAILURES", failures);
+    startActivity(intent);
+  }
+
+} // class DictationActivity
