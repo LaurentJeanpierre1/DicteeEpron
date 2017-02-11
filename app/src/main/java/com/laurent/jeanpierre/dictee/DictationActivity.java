@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -67,6 +69,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     setContentView(R.layout.activity_dictation);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+    setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
     if (savedInstanceState == null) {
       try {
@@ -87,8 +90,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     });
     fab.setVisibility(ImageView.INVISIBLE);
     tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-      @Override
-      public void onInit(int i) {
+    @Override
+    public void onInit(int i) {
         tts.setSpeechRate(0.75f);
         if (savedInstanceState == null)
           selectWord();
@@ -97,6 +100,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
 
     if (savedInstanceState != null) {
       score = savedInstanceState.getInt("score", 0);
+      ((TextView) findViewById(R.id.score)).setText(getString(R.string.textScore, Integer.toString(score)));
       nbWords = savedInstanceState.getInt("length", words.length);
       wordCount = savedInstanceState.getIntArray("wordCount");
       if (wordCount == null)
@@ -110,7 +114,9 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       solutionIdx = savedInstanceState.getInt("idx",-1);
       if (solutionIdx != -1) {
         solution = words[solutionIdx];
+        ((TextView) findViewById(R.id.solution)).setText(String.format("%d", wordCount[solutionIdx])); //solution
         onRepeatPressed(null);
+        isReset = false;
       } else
         selectWord();
     }
@@ -181,7 +187,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     OpenKeyBoard(getApplicationContext());
     findViewById(R.id.fab).setVisibility(ImageView.INVISIBLE);
     findViewById(R.id.editAnswer).setEnabled(true);
-  }
+    isReset = false;
+  } // selectWord()
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -239,6 +246,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       text.setSpan(new ForegroundColorSpan(Color.GREEN),0, answerText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
       answer.setText(text, TextView.BufferType.SPANNABLE);
     } else {
+      MediaPlayer.create(this, R.raw.buzz2).start();
       msg = R.string.failure;
       dur = Snackbar.LENGTH_INDEFINITE;
       ++wordCount[solutionIdx];
@@ -330,6 +338,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     intent.putExtra("WORDS", words);
     intent.putExtra("TRIALS", trials);
     intent.putExtra("FAILURES", failures);
+    intent.putExtra("PRONOUNCE", wordsPronounce);
     isReset = true;
     startActivityForResult(intent, 213);
   }
@@ -342,8 +351,10 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (requestCode == 213)
+    if (requestCode == 213) {
       selectWord();
+      ((TextView) findViewById(R.id.editAnswer)).setText("");
+    }
     super.onActivityResult(requestCode, resultCode, data);
   }
 } // class DictationActivity

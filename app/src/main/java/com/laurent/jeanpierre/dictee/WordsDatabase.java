@@ -24,7 +24,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 17; // Lettre J
+  private static final int DATABASE_VERSION = 18; // Lettre J
   /** Latest letter from database. */
   public static char last_letter = 'J';
   /** All letters from database. */
