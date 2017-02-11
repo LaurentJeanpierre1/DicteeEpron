@@ -25,8 +25,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
       super.onCreate(savedInstanceState);
       getFragmentManager().beginTransaction().replace(android.R.id.content, frag=new SettingsFragment()).commit();
 
-      checkValues();
-
       ActionBar actionBar = getActionBar();
       if (actionBar != null)
         actionBar.setDisplayHomeAsUpEnabled(true); // Displays up button in action bar
@@ -40,11 +38,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     }
     return super.onOptionsItemSelected(item);
   }
-
-  private void checkValues()
-    {
-      SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-    }
 
   @Override
   protected void onResume() {

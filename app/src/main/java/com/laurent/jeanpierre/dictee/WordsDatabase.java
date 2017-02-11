@@ -1,7 +1,6 @@
 package com.laurent.jeanpierre.dictee;
 
 
-import android.app.Application;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +9,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 16; // Lettre ʃ (ch)
+  private static final int DATABASE_VERSION = 17; // Lettre J
   /** Latest letter from database. */
-  public static char last_letter = 'ʃ';
+  public static char last_letter = 'J';
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
@@ -82,8 +80,8 @@ public class WordsDatabase extends SQLiteOpenHelper {
 
   public void getAllWords(String filter) {
 
-    LinkedList<String> wordsList = new LinkedList<String>();
-    LinkedList<String> soundsList = new LinkedList<String>();
+    LinkedList<String> wordsList = new LinkedList<>();
+    LinkedList<String> soundsList = new LinkedList<>();
 // Select All Query
     String selectQuery = "SELECT name,pronunce FROM " + TABLE_WORDS;
     if ((filter != null) && !filter.isEmpty())
@@ -116,6 +114,8 @@ public class WordsDatabase extends SQLiteOpenHelper {
           soundsList.add(p);
       } while (cursor.moveToNext());
     }
+    cursor.close();
+    db.close();
     words = new String[wordsList.size()];
     wordsPronounce = new String[wordsList.size()];
     int i=0;
