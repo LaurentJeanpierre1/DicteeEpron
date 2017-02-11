@@ -26,7 +26,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,7 +49,6 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
   private String solution;
   private int solutionIdx;
   private TextToSpeech tts;
-  private WordsDatabase db;
   boolean isReset;
 
   //For open keyboard
@@ -64,19 +62,21 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY,0);
   }
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
+  protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dictation);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    try {
-      new WordsDatabase(this).getReadableDatabase().close(); // in case of update
-    } catch (SQLiteDatabaseCorruptException ex) {
-      Log.d("Dictée", "Database updated?", ex);
-    }
-    WordsDatabase.computeLetters(this);
-    resetWords("(\""+WordsDatabase.last_letter+"\")");
 
+    if (savedInstanceState == null) {
+      try {
+        new WordsDatabase(this).getReadableDatabase().close(); // in case of update
+      } catch (SQLiteDatabaseCorruptException ex) {
+        Log.d("Dictée", "Database updated?", ex);
+      }
+      WordsDatabase.computeLetters(this);
+    }
+    resetWords("(\"" + WordsDatabase.last_letter + "\")");
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -90,19 +90,52 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       @Override
       public void onInit(int i) {
         tts.setSpeechRate(0.75f);
-        selectWord();
+        if (savedInstanceState == null)
+          selectWord();
       }
     });
+
+    if (savedInstanceState != null) {
+      score = savedInstanceState.getInt("score", 0);
+      nbWords = savedInstanceState.getInt("length", words.length);
+      wordCount = savedInstanceState.getIntArray("wordCount");
+      if (wordCount == null)
+        wordCount = new int[nbWords];
+      trials = savedInstanceState.getIntArray("trials");
+      if (trials == null)
+        trials = new int[nbWords];
+      failures = savedInstanceState.getIntArray("failures");
+      if (failures == null)
+        failures = new int[nbWords];
+      solutionIdx = savedInstanceState.getInt("idx",-1);
+      if (solutionIdx != -1) {
+        solution = words[solutionIdx];
+        onRepeatPressed(null);
+      } else
+        selectWord();
+    }
+  } // onCreate(savedInstanceState)
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putInt("score",score);
+    outState.putInt("length",nbWords);
+    outState.putIntArray("wordCount",wordCount);
+    outState.putIntArray("trials",trials);
+    outState.putIntArray("failures",failures);
+    outState.putInt("idx",solutionIdx);
   }
 
   private void resetWords(String filter) {
     if (filter != null) {
-      db = new WordsDatabase(this);
+      WordsDatabase db = new WordsDatabase(this);
       db.getAllWords(filter);
       words = db.words;
       wordsPronounce = db.wordsPronounce;
     }
 
+    score = 0;
     nbWords = words.length;
     wordCount = new int[nbWords];
     trials = new int[nbWords];
@@ -125,6 +158,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
   private void selectWord() {
     ((TextView) findViewById(R.id.score)).setText(getString(R.string.textScore, Integer.toString(score)));
     String newOne = null;
+    //noinspection StringEquality // solution is drawn from this same array
     do {
       int tot = new Random().nextInt(nbWords);
       for (int i=0; i<words.length; ++i) {
@@ -137,16 +171,16 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       } // for i
     } while ((newOne == null) || (newOne == solution));
     solution = newOne;
-    ((TextView) findViewById(R.id.solution)).setText(""+wordCount[solutionIdx]);//solution
+    ((TextView) findViewById(R.id.solution)).setText(String.format("%d", wordCount[solutionIdx])); //solution
     String sentence = MessageFormat.format(getString(R.string.spokenInviteWord), wordsPronounce[solutionIdx]);
     if (Build.VERSION.SDK_INT<21)
       tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
     else
-      tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null, solution);
-    ((Button) findViewById(R.id.validate)).setEnabled(true);
+      tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null, solution); // does not exist before API 21
+    findViewById(R.id.validate).setEnabled(true);
     OpenKeyBoard(getApplicationContext());
-    ((FloatingActionButton) findViewById(R.id.fab)).setVisibility(ImageView.INVISIBLE);
-    ((EditText) findViewById(R.id.editAnswer)).setEnabled(true);
+    findViewById(R.id.fab).setVisibility(ImageView.INVISIBLE);
+    findViewById(R.id.editAnswer).setEnabled(true);
   }
 
   @Override
@@ -211,9 +245,9 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       ++nbWords;
       --score;
       ++failures[solutionIdx];
-      ((FloatingActionButton) findViewById(R.id.fab)).setVisibility(ImageView.VISIBLE);
+      findViewById(R.id.fab).setVisibility(ImageView.VISIBLE);
       SpannableStringBuilder text = new SpannableStringBuilder();
-      StrDiff dif = null;
+      StrDiff dif;
       try {
         dif = new StrDiff(solution, answerText.trim());
       } catch (Throwable t) {
@@ -230,11 +264,11 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       }
       answer.setText(text, TextView.BufferType.SPANNABLE);
     }
-    ((Button) findViewById(R.id.validate)).setEnabled(false);
+    findViewById(R.id.validate).setEnabled(false);
     answer.setEnabled(false);
     ((TextView) findViewById(R.id.score)).setText(getString(R.string.textScore, Integer.toString(score)));
     String msg2 = getString(msg, solution);
-    Snackbar.make(v, msg2, dur).setAction("Action", null).setCallback(new Snackbar.Callback() {
+    Snackbar.make(v, msg2, dur).setAction("Action", null).addCallback(new Snackbar.Callback() {
       @Override
       public void onDismissed(Snackbar snackbar, int event) {
         super.onDismissed(snackbar, event);
@@ -279,13 +313,14 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
 
     Set<String> ss = sharedPreferences.getStringSet(s,null);
     StringBuilder sb = new StringBuilder("(");
-    for(String v : ss) {
-      if (sb.length() != 1)
-        sb.append(", ");
-      sb.append('"');
-      sb.append(v);
-      sb.append('"');
-    }
+    if (ss != null)
+      for(String v : ss) {
+        if (sb.length() != 1)
+          sb.append(", ");
+        sb.append('"');
+        sb.append(v);
+        sb.append('"');
+      }
     sb.append(')');
     resetWords(sb.toString());
   }
@@ -295,7 +330,20 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     intent.putExtra("WORDS", words);
     intent.putExtra("TRIALS", trials);
     intent.putExtra("FAILURES", failures);
-    startActivity(intent);
+    isReset = true;
+    startActivityForResult(intent, 213);
   }
 
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    showResults();
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == 213)
+      selectWord();
+    super.onActivityResult(requestCode, resultCode, data);
+  }
 } // class DictationActivity

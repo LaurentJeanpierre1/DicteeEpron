@@ -1,5 +1,6 @@
 package com.laurent.jeanpierre.dictee;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,6 +42,10 @@ String[] words;
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
       ((ViewHolder)holder).setItem(position);
+      if (position % 2 == 0)
+        holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+      else
+        holder.itemView.setBackgroundColor(Color.CYAN);
     }
 
     @Override
