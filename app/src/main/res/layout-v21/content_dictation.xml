@@ -49,4 +49,15 @@
         android:id="@+id/validate"
         android:elevation="1dp"
         style="@android:style/Widget.Button" />
+
+    <TextView
+        android:text="@string/textScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/score"
+        android:textAlignment="center"
+        />
+
 </RelativeLayout>
