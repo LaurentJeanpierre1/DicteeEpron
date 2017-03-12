@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 18; // Lettre J
+  private static final int DATABASE_VERSION = 19; // Lettre é
   /** Latest letter from database. */
-  public static char last_letter = 'J';
+  public static char last_letter = 'é';
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
@@ -108,7 +108,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
       do {
         wordsList.add(cursor.getString(0).trim()); // remove extra spaces just-in-case
         String p = cursor.getString(1);
-        if (p == null)
+        if ((p == null) || (p.isEmpty()))
           soundsList.add(wordsList.getLast());
         else
           soundsList.add(p);

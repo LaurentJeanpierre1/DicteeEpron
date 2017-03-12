@@ -178,6 +178,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     } while ((newOne == null) || (newOne == solution));
     solution = newOne;
     ((TextView) findViewById(R.id.solution)).setText(String.format("%d", wordCount[solutionIdx])); //solution
+    String fmt = getString(R.string.spokenInviteWord);
     String sentence = MessageFormat.format(getString(R.string.spokenInviteWord), wordsPronounce[solutionIdx]);
     if (Build.VERSION.SDK_INT<21)
       tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);

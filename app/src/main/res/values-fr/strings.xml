@@ -8,7 +8,7 @@
     <string name="validateString">OK</string>
     <string name="bravo">Bravo !</string>
     <string name="failure">Non ! C\'était \"%s\"</string>
-    <string name="spokenInviteWord">écrit : \"{}\".</string>
+    <string name="spokenInviteWord">écrit : \"{0}\".</string>
     <string name="repeatText">Répéter</string>
     <string name="textScore">score : %s</string>
     <string name="soundsTitle">Sons :</string>
