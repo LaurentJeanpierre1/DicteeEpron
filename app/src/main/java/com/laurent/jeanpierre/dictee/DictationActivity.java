@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.text.MessageFormat;
@@ -147,11 +148,13 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     trials = new int[nbWords];
     failures = new int[nbWords];
     for (int i=0; i<nbWords; ++i) {
-      wordCount[i] = 3;
+      wordCount[i] = 4;
       trials[i] = 0;
       failures[i] = 0;
     }
-    nbWords = 3*words.length;
+    nbWords = 4*4*words.length;
+    ((RatingBar) findViewById(R.id.stars)).setNumStars(3);
+    ((RatingBar) findViewById(R.id.stars)).setMax(3);
     isReset = true;
   }
 
@@ -168,7 +171,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     do {
       int tot = new Random().nextInt(nbWords);
       for (int i=0; i<words.length; ++i) {
-        tot -= wordCount[i];
+        tot -= wordCount[i]*wordCount[i];
         if (tot <= 0) {
           newOne = words[i];
           solutionIdx = i;
@@ -177,7 +180,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       } // for i
     } while ((newOne == null) || (newOne == solution));
     solution = newOne;
-    ((TextView) findViewById(R.id.solution)).setText(String.format("%d", wordCount[solutionIdx])); //solution
+    ((TextView) findViewById(R.id.solution)).setText(String.format("%d/%d", wordCount[solutionIdx], (int)(0.95+Math.sqrt(nbWords/words.length)))); //solution
+    ((RatingBar) findViewById(R.id.stars)).setRating(4-(int)(0.95+Math.sqrt(nbWords/words.length)));
     String fmt = getString(R.string.spokenInviteWord);
     String sentence = MessageFormat.format(getString(R.string.spokenInviteWord), wordsPronounce[solutionIdx]);
     if (Build.VERSION.SDK_INT<21)
@@ -238,9 +242,12 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     if (answerText.equalsIgnoreCase(solution)) {
       msg = R.string.bravo;
       dur = Snackbar.LENGTH_SHORT;
-      if (wordCount[solutionIdx] > 1) {
+      int nb = wordCount[solutionIdx];
+      if (nb > 1) {
         --wordCount[solutionIdx];
-        --nbWords;
+        //nbWords -= nb*nb - (nb-1)*(nb-1); // a²-b² = (a-b)(a+b) => (nb-nb+1)(nb+nb-1)=2nb-1
+        nbWords -= 2*nb-1; // 3=>2 => nbWords-9+4 = nbWords -(2*3-1)
+        Log.d("Remaining word-count",Integer.toString(nbWords));
       }
       ++score;
       SpannableString text = new SpannableString(answerText);
@@ -251,7 +258,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       msg = R.string.failure;
       dur = Snackbar.LENGTH_INDEFINITE;
       ++wordCount[solutionIdx];
-      ++nbWords;
+      nbWords += 2*wordCount[solutionIdx]-1; // 3=>4 => nbWords-9+16 = nbWords + 2*4-1
+      Log.d("Remaining word-count",Integer.toString(nbWords));
       --score;
       ++failures[solutionIdx];
       findViewById(R.id.fab).setVisibility(ImageView.VISIBLE);

@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 19; // Lettre é
+  private static final int DATABASE_VERSION = 21; // Son ɔ̃ (on)
   /** Latest letter from database. */
-  public static char last_letter = 'é';
+  public static String last_letter = "ɔ̃";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
@@ -122,6 +122,8 @@ public class WordsDatabase extends SQLiteOpenHelper {
     for (String w : wordsList) words[i++] = w;
     i=0;
     for (String w : soundsList) wordsPronounce[i++] = w;
+    if (wordsList.isEmpty())
+      getAllWords(null);
   } // getAllWords()
 
   /**
@@ -142,7 +144,8 @@ public class WordsDatabase extends SQLiteOpenHelper {
       }
       cursor.close();
       all_letters = sb.toString();
-      last_letter = sb.charAt(sb.length()-1);
+      if (last_letter == null || last_letter.isEmpty())
+        last_letter = all_letters_array.getLast();
       db.close();
     } catch (Exception e) {
       Log.e("Dictée","Unable to compute letters from database",e);
