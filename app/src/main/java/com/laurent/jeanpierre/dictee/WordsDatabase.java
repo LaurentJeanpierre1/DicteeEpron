@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 21; // Son ɔ̃ (on)
+  private static final int DATABASE_VERSION = 23; // added android-metadata
   /** Latest letter from database. */
-  public static String last_letter = "ɔ̃";
+  public static String last_letter = "S";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
