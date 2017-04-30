@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 23; // added android-metadata
+  private static final int DATABASE_VERSION = 27; // added sound 'è'
   /** Latest letter from database. */
-  public static String last_letter = "S";
+  public static String last_letter = "è";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
@@ -51,7 +51,13 @@ public class WordsDatabase extends SQLiteOpenHelper {
   }
 
   private void importDB(Context context, File dbPath) throws IOException {
-    Toast.makeText(context,"Copying DB ...",Toast.LENGTH_LONG).show();
+    if (context.getDatabasePath(DATABASE_NAME).exists()) {
+      context.getDatabasePath(DATABASE_NAME).delete();
+      File journal = new File(context.getDatabasePath(DATABASE_NAME).getAbsolutePath() + "-journal");
+      if (journal.exists())
+        journal.delete();
+    }
+    Toast.makeText(context,"Copying DB ...",Toast.LENGTH_SHORT).show();
     byte buf[] = new byte[1024];
     int len;
     InputStream in = context.getAssets().open(DATABASE_NAME);
@@ -59,7 +65,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
     while ((len = in.read(buf))>0) out.write(buf, 0, len);
     out.flush();
     out.close();
-    Toast.makeText(context,"Copy DB ok",Toast.LENGTH_LONG).show();
+    Toast.makeText(context,"Copy DB ok",Toast.LENGTH_SHORT).show();
   }
 
   @Override
@@ -133,11 +139,15 @@ public class WordsDatabase extends SQLiteOpenHelper {
     try {
       WordsDatabase base = new WordsDatabase(c);
       SQLiteDatabase db = base.getReadableDatabase();
+      //Cursor cursor = db.rawQuery("select `set`, name from Words", null);
       Cursor cursor = db.rawQuery("select distinct `set` from Words", null);
       StringBuilder sb = new StringBuilder();
       if (cursor.moveToFirst()) {
         do {
-          String letter = cursor.getString(0).trim(); // remove extra spaces just-in-case
+          String letter = cursor.getString(0);
+          if (letter != null)
+            letter = letter.trim(); // remove extra spaces just-in-case
+//          Log.e("Dictée","word: "+cursor.getString(1) + "  -  "+cursor.getString(0));
           sb.append(letter);
           all_letters_array.add(letter);
         } while (cursor.moveToNext());
