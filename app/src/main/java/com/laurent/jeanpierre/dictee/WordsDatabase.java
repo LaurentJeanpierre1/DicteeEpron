@@ -24,7 +24,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 27; // added sound 'è'
+  private static final int DATABASE_VERSION = 28; // added comment for sea
   /** Latest letter from database. */
   public static String last_letter = "è";
   /** All letters from database. */

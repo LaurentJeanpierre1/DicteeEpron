@@ -153,8 +153,10 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       failures[i] = 0;
     }
     nbWords = 4*4*words.length;
-    ((RatingBar) findViewById(R.id.stars)).setNumStars(3);
-    ((RatingBar) findViewById(R.id.stars)).setMax(3);
+    final RatingBar stars = (RatingBar) findViewById(R.id.stars);
+    stars.setNumStars(3);
+    stars.setMax(3);
+    stars.setStepSize(0.5f);
     isReset = true;
   }
 
@@ -180,9 +182,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       } // for i
     } while ((newOne == null) || (newOne == solution));
     solution = newOne;
-    ((TextView) findViewById(R.id.solution)).setText(String.format("%d/%d", wordCount[solutionIdx], (int)(0.95+Math.sqrt(nbWords/words.length)))); //solution
-    ((RatingBar) findViewById(R.id.stars)).setRating(4-(int)(0.95+Math.sqrt(nbWords/words.length)));
-    String fmt = getString(R.string.spokenInviteWord);
+    ((TextView) findViewById(R.id.solution)).setText(String.format("%d/%1.1f", wordCount[solutionIdx], (Math.sqrt(nbWords/words.length)))); //solution
+    ((RatingBar) findViewById(R.id.stars)).setRating(4-0.5f*(int)(0.95+2*Math.sqrt(nbWords/words.length)));
     String sentence = MessageFormat.format(getString(R.string.spokenInviteWord), wordsPronounce[solutionIdx]);
     if (Build.VERSION.SDK_INT<21)
       tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
