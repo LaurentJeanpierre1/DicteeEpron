@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 28; // added comment for sea
+  private static final int DATABASE_VERSION = 31; // son ɲ (/gn/)
   /** Latest letter from database. */
-  public static String last_letter = "è";
+  public static String last_letter = "";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
