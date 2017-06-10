@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 31; // son ɲ (/gn/)
+  private static final int DATABASE_VERSION = 35; // unvariable words a (Ib-Ij)
   /** Latest letter from database. */
-  public static String last_letter = "";
+  public static String last_letter = "'Ia','Ib','Ic','Id','Ie','If','Ih','Ii','Ij'";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
@@ -92,6 +92,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
     String selectQuery = "SELECT name,pronunce FROM " + TABLE_WORDS;
     if ((filter != null) && !filter.isEmpty())
       selectQuery += " WHERE `set` IN "+filter;
+    //Log.i("DB-query",selectQuery);
     SQLiteDatabase db = this.getReadableDatabase();
     Cursor cursor;
     try {
@@ -148,11 +149,14 @@ public class WordsDatabase extends SQLiteOpenHelper {
           if (letter != null)
             letter = letter.trim(); // remove extra spaces just-in-case
 //          Log.e("Dictée","word: "+cursor.getString(1) + "  -  "+cursor.getString(0));
+          sb.append('\'');
           sb.append(letter);
+          sb.append("',");
           all_letters_array.add(letter);
         } while (cursor.moveToNext());
       }
       cursor.close();
+      sb.deleteCharAt(sb.length()-1); // remove the last ','
       all_letters = sb.toString();
       if (last_letter == null || last_letter.isEmpty())
         last_letter = all_letters_array.getLast();

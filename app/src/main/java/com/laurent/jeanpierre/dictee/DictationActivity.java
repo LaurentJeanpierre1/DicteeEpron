@@ -80,7 +80,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       }
       WordsDatabase.computeLetters(this);
     }
-    resetWords("(\"" + WordsDatabase.last_letter + "\")");
+    resetWords("(" + WordsDatabase.last_letter + ")");
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -258,6 +258,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       MediaPlayer.create(this, R.raw.buzz2).start();
       msg = R.string.failure;
       dur = Snackbar.LENGTH_INDEFINITE;
+      ++wordCount[solutionIdx];
+      nbWords += 2*wordCount[solutionIdx]-1; // 3=>4 => nbWords-9+16 = nbWords + 2*4-1
       ++wordCount[solutionIdx];
       nbWords += 2*wordCount[solutionIdx]-1; // 3=>4 => nbWords-9+16 = nbWords + 2*4-1
       Log.d("Remaining word-count",Integer.toString(nbWords));
