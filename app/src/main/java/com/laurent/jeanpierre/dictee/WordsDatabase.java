@@ -24,9 +24,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 35; // unvariable words a (Ib-Ij)
+  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
   /** Latest letter from database. */
-  public static String last_letter = "'Ia','Ib','Ic','Id','Ie','If','Ih','Ii','Ij'";
+  public static String last_letter = "'Il','Im','Ip'";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
