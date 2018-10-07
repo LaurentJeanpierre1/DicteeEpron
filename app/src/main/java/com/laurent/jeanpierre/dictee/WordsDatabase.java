@@ -19,14 +19,15 @@ import java.util.LinkedList;
  */
 public class WordsDatabase extends SQLiteOpenHelper {
   // Database Name
-  private static final String DATABASE_NAME = "words.sqlite";
+  private static final String DATABASE_NAME = "words2018.sqlite";
   // words table name
   private static final String TABLE_WORDS = "Words";
 
   // Database Version
-  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
+// 2017  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
+  private static final int DATABASE_VERSION = 38; // Dictée 1 CM1 v2
   /** Latest letter from database. */
-  public static String last_letter = "'Il','Im','Ip'";
+  public static String last_letter = "'D1J1','D1J2','D1J3'";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
