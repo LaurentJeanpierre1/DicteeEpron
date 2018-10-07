@@ -2,9 +2,11 @@ package com.laurent.jeanpierre.dictee;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,7 +15,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Set;
+
 /** The Words database
  * Created by jeanpierre on 07/12/16.
  */
@@ -25,7 +31,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
 
   // Database Version
 // 2017  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
-  private static final int DATABASE_VERSION = 42; // Dictée 5 CM1 v3
+  private static final int DATABASE_VERSION = 44; // Dictée 5 CM1 v4
   /** Latest letter from database. */
   public static String last_letter = "'D5J1','D5J2','D5J3'";
   /** All letters from database. */
@@ -162,6 +168,15 @@ public class WordsDatabase extends SQLiteOpenHelper {
       if (last_letter == null || last_letter.isEmpty())
         last_letter = all_letters_array.getLast();
       db.close();
+      Set<String> prefs = PreferenceManager.getDefaultSharedPreferences(c).getStringSet(c.getString(R.string.soundsTitle),null);
+      LinkedList<String> toRemove = new LinkedList<>();
+      for (String entry : prefs)
+        if (! all_letters_array.contains(entry)) {
+          toRemove.add(entry);
+          Log.d("Removed preference:", entry);
+        }
+      prefs.removeAll(toRemove);
+
     } catch (Exception e) {
       Log.e("Dictée","Unable to compute letters from database",e);
     }
