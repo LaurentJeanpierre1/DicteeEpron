@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
+import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -75,7 +76,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     if (savedInstanceState == null) {
       try {
         new WordsDatabase(this).getReadableDatabase().close(); // in case of update
-      } catch (SQLiteDatabaseCorruptException ex) {
+      } catch (SQLiteDatabaseCorruptException | SQLiteReadOnlyDatabaseException ex) {
         Log.d("Dictée", "Database updated?", ex);
       }
       WordsDatabase.computeLetters(this);
