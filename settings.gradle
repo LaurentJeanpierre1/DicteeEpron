@@ -1,1 +1,1 @@
-/home/jeanpierre/AndroidstudioProjects/Applicationlecture/settings.gradle
+include ':app'
