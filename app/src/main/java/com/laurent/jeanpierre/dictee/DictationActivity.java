@@ -35,6 +35,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
@@ -116,7 +117,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       solutionIdx = savedInstanceState.getInt("idx",-1);
       if (solutionIdx != -1) {
         solution = words[solutionIdx];
-        ((TextView) findViewById(R.id.solution)).setText(String.format("%d", wordCount[solutionIdx])); //solution
+        ((TextView) findViewById(R.id.solution)).setText(String.format(Locale.FRENCH,"%d", wordCount[solutionIdx])); //solution
         onRepeatPressed(null);
         isReset = false;
       } else
@@ -183,7 +184,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       } // for i
     } while ((newOne == null) || (newOne == solution));
     solution = newOne;
-    ((TextView) findViewById(R.id.solution)).setText(String.format("%d/%1.1f", wordCount[solutionIdx], (Math.sqrt(nbWords/words.length)))); //solution
+    ((TextView) findViewById(R.id.solution)).setText(String.format(Locale.getDefault(), "%d/%1.1f", wordCount[solutionIdx], (Math.sqrt(nbWords/words.length)))); //solution
     ((RatingBar) findViewById(R.id.stars)).setRating(4-0.5f*(int)(0.95+2*Math.sqrt(nbWords/words.length)));
     String sentence = MessageFormat.format(getString(R.string.spokenInviteWord), wordsPronounce[solutionIdx]);
     if (Build.VERSION.SDK_INT<21)
@@ -275,6 +276,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
         System.gc();
         dif = new StrDiff(solution, ""); // matching simple
       }
+      Log.d("Validate-word:",String.format(Locale.FRENCH,"%s for %s => %s.",solution,answerText.trim(),dif.best.op));
       for (int i=0, p1 = 0, p2=0; i<dif.best.op.length(); ++i) {
         switch(dif.best.op.charAt(i)) {
           case '=' : text.append(answerText.charAt(p2)); text.setSpan(new ForegroundColorSpan(Color.GREEN),i,i+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);++p1; ++p2; break;
@@ -288,7 +290,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     findViewById(R.id.validate).setEnabled(false);
     answer.setEnabled(false);
     ((TextView) findViewById(R.id.score)).setText(getString(R.string.textScore, Integer.toString(score)));
-    String msg2 = getString(msg, solution);
+    String msg2 = getString(msg, solution, answerText.trim());
     Snackbar.make(v, msg2, dur).setAction("Action", null).addCallback(new Snackbar.Callback() {
       @Override
       public void onDismissed(Snackbar snackbar, int event) {
