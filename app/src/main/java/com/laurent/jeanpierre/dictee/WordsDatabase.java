@@ -31,9 +31,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
 
   // Database Version
 // 2017  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
-  private static final int DATABASE_VERSION = 44; // Dictée 5 CM1 v4
+  private static final int DATABASE_VERSION = 46; // Dictée 6 CM1 v2
   /** Latest letter from database. */
-  public static String last_letter = "'D5J1','D5J2','D5J3'";
+  public static String last_letter = "'D6J1','D6J2','D6J3'";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
@@ -169,14 +169,15 @@ public class WordsDatabase extends SQLiteOpenHelper {
         last_letter = all_letters_array.getLast();
       db.close();
       Set<String> prefs = PreferenceManager.getDefaultSharedPreferences(c).getStringSet(c.getString(R.string.soundsTitle),null);
-      LinkedList<String> toRemove = new LinkedList<>();
-      for (String entry : prefs)
-        if (! all_letters_array.contains(entry)) {
-          toRemove.add(entry);
-          Log.d("Removed preference:", entry);
-        }
-      prefs.removeAll(toRemove);
-
+      if (prefs != null) {
+        LinkedList<String> toRemove = new LinkedList<>();
+        for (String entry : prefs)
+          if (!all_letters_array.contains(entry)) {
+            toRemove.add(entry);
+            Log.d("Removed preference:", entry);
+          }
+        prefs.removeAll(toRemove);
+      }
     } catch (Exception e) {
       Log.e("Dictée","Unable to compute letters from database",e);
     }
