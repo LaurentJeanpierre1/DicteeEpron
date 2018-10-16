@@ -82,7 +82,23 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       }
       WordsDatabase.computeLetters(this);
     }
-    resetWords("(" + WordsDatabase.last_letter + ")");
+
+    Set<String> ss = PreferenceManager.getDefaultSharedPreferences(this).getStringSet(getString(R.string.soundsTitle),null);
+    if (ss != null) {
+      StringBuilder sb = new StringBuilder("(");
+      if (ss != null)
+        for (String v : ss) {
+          if (sb.length() != 1)
+            sb.append(", ");
+          sb.append('"');
+          sb.append(v);
+          sb.append('"');
+        }
+      sb.append(')');
+      resetWords(sb.toString());
+    } else {
+      resetWords(WordsDatabase.last_letter);
+    }
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -93,8 +109,8 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     });
     fab.setVisibility(ImageView.INVISIBLE);
     tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-    @Override
-    public void onInit(int i) {
+      @Override
+      public void onInit(int i) {
         tts.setSpeechRate(0.75f);
         if (savedInstanceState == null)
           selectWord();
@@ -115,6 +131,11 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
       if (failures == null)
         failures = new int[nbWords];
       solutionIdx = savedInstanceState.getInt("idx",-1);
+      final RatingBar stars = (RatingBar) findViewById(R.id.stars);
+      stars.setNumStars(3);
+      stars.setMax(3);
+      stars.setStepSize(0.5f);
+      stars.setRating(4-0.5f*(int)(0.95+2*Math.sqrt(nbWords/words.length)));
       if (solutionIdx != -1) {
         solution = words[solutionIdx];
         ((TextView) findViewById(R.id.solution)).setText(String.format(Locale.FRENCH,"%d", wordCount[solutionIdx])); //solution
@@ -159,6 +180,7 @@ public class DictationActivity extends AppCompatActivity implements SharedPrefer
     stars.setNumStars(3);
     stars.setMax(3);
     stars.setStepSize(0.5f);
+    stars.setRating(4-0.5f*(int)(0.95+2*Math.sqrt(nbWords/words.length)));
     isReset = true;
   }
 

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 
 /** The Words database
  * Created by jeanpierre on 07/12/16.
@@ -31,7 +32,7 @@ public class WordsDatabase extends SQLiteOpenHelper {
 
   // Database Version
 // 2017  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
-  private static final int DATABASE_VERSION = 46; // Dictée 6 CM1 v2
+  private static final int DATABASE_VERSION = 49; // Dictée 6 CM1 v2d
   /** Latest letter from database. */
   public static String last_letter = "'D6J1','D6J2','D6J3'";
   /** All letters from database. */
@@ -73,6 +74,17 @@ public class WordsDatabase extends SQLiteOpenHelper {
     out.flush();
     out.close();
     Toast.makeText(context,"Copy DB ok",Toast.LENGTH_SHORT).show();
+
+    Set<String> prefs = new TreeSet<>();
+    String[] letters = last_letter.split(",");
+    for (String letter : letters) {
+      prefs.add(letter.substring(1,letter.length()-1)); // remove first & last "'"
+    }
+    PreferenceManager.getDefaultSharedPreferences(context).edit()
+        .clear()
+        .putStringSet(context.getString(R.string.soundsTitle),prefs)
+        .apply();
+    Toast.makeText(context,"Preferences applied",Toast.LENGTH_SHORT).show();
   }
 
   @Override
@@ -177,6 +189,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
             Log.d("Removed preference:", entry);
           }
         prefs.removeAll(toRemove);
+        PreferenceManager.getDefaultSharedPreferences(c).edit().
+            putStringSet(c.getString(R.string.soundsTitle), prefs)
+            .apply();
       }
     } catch (Exception e) {
       Log.e("Dictée","Unable to compute letters from database",e);
