@@ -32,9 +32,9 @@ public class WordsDatabase extends SQLiteOpenHelper {
 
   // Database Version
 // 2017  private static final int DATABASE_VERSION = 36; // unvariable words a (Ib-Ij)
-  private static final int DATABASE_VERSION = 49; // Dictée 6 CM1 v2d
+  private static final int DATABASE_VERSION = 52; // Dictée 7 CM1 v3
   /** Latest letter from database. */
-  public static String last_letter = "'D6J1','D6J2','D6J3'";
+  public static String last_letter = "'D7'";
   /** All letters from database. */
   public static String all_letters = "";
   /** All letters from database. */
